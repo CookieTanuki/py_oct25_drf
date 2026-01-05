@@ -18,12 +18,14 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "rest_framework.authtoken",
     # third-party apps
     "rest_framework",
     "debug_toolbar",
     'django_filters',
     # local apps
     "messenger",
+    "users"
 ]
 
 MIDDLEWARE = [
@@ -109,4 +111,8 @@ REST_FRAMEWORK = {
         "rest_framework.renderers.JSONRenderer",
         "rest_framework.renderers.BrowsableAPIRenderer",
     ],
+    "PAGE_SIZE": 10,
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.TokenAuthentication"
+    ]
 }
