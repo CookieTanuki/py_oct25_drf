@@ -17,6 +17,11 @@ class Message(models.Model):
     )
     tags = models.ManyToManyField(Tag, related_name="messages")
     image = models.ImageField(upload_to="messages/images/", null=True, blank=True)
+    likes = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        related_name="liked_messages",
+        blank=True,
+    )
 
     def __str__(self) -> str:
         return self.text

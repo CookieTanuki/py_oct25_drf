@@ -1,8 +1,10 @@
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
-from rest_framework import filters
+from rest_framework import filters, status
 
 from base.mixins import ActionSerializerMixin
 from messenger.filters import MessageFilter
@@ -35,8 +37,27 @@ class MessageViewSet(ActionSerializerMixin, ModelViewSet):
         match self.action:
             case "retrieve":
                 queryset = queryset.select_related("user")
+            case "list":
+                queryset = queryset.prefetch_related("likes", "tags")
 
         return queryset
 
+    @action(
+        methods=["POST"],
+        detail=True,
+        url_path="like",
+    )
+    def toggle_like(self, request, pk=None):
+        message = self.get_object()
+        user = request.user
+        if message.likes.filter(id=user.id).exists():
+            message.likes.remove(user)
+            liked = False
+        else:
+            message.likes.add(user)
+            liked = True
 
-# TODO implement /api/messages/<id>/like/
+        return Response(
+            {"id": message.id, "is_liked": liked, "likes_count": message.likes.count()},
+            status=status.HTTP_200_OK,
+        )
